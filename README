@@ -1,0 +1,19 @@
+Spoons
+
+This is a web application which allows a group of up to 12 people play the card game "Spoons".
+I will not go over instructions at this time, as they can be looked up on the internet. When gameplay is complete, I will include the rules to my implemenation.
+
+What makes this different from most web applications is the mobile integration. This game requires that users connect to a room session via a mobile device in order to play the game. Game statistics and other information will display on the main desktop browsing session while each player's personal cards will only be visible to each respective individual. Gameplay is also achieved through mobile gestures (swiping, tapping, etc).
+
+Tools/Frameworks used:
+Paper.js
+Node.js
+Socket.io
+jQuery
+
+~~~~~~~~~~~~~~~~~ Versioning Documentation ~~~~~~~~~~~~~~~~~
+
+>2015.02.16:
+	Initial Commit
+	Completed UI states A(Desktop-welcome) and B(Desktop-create room)
+	Click "Create room" in state A, app goes to state B

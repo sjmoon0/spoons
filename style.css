@@ -1,0 +1,38 @@
+body {
+    background-color: #b0c4de;
+}
+
+h1{
+    font-family: 'Indie Flower', cursive;
+	font-size: 75px;
+}
+
+.col-centered{
+	/*
+    float: none;
+    margin: 0 auto;
+    */
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.other-centered{
+	/*
+	margin-right: auto;
+	margin-left: auto;
+	*/
+	display: block;
+	margin: 0 auto;
+}
+
+.center-text{
+	text-align: center;
+}
+
+.fill-width{
+	width:100%;
+}
+
+.make-tall-fifty{
+	height:50px;
+}

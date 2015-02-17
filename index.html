@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Spoons</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<link rel="stylesheet" href="http://131.118.95.193/thesis/style.css">
+		<link href='http://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<!--
+		<style>
+			#chat{
+				height:500px;
+			}
+		</style>
+		-->
+	</head>
+	<body>
+		<!--
+		<div id='chat'></div>
+		<form id="sendmessage">
+			<input size="35" id="message"></input>
+			<input type="submit"></input>
+		</form>
+		-->
+		<div class="container a">	
+			<div class="row col-centered">
+				<h1 class="center-text">Spoons</h1>
+				<h5 class="center-text">A game developed by Steven Moon</h5>
+				<h5 class="center-text">Frostburg State University</h5>
+			</div>
+			<div class="row col-centered">
+				<div class="col-xs-6 col-md-3"></div>
+				<div class="col-xs-6 col-md-3">
+					<button id="view_rooms" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+						View Rooms
+					  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+					</button>
+				</div>
+				<div class="col-xs-6 col-md-3">
+					<button id="create_room" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+						Create Room
+					  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+					</button>
+				</div>
+				<div class="col-xs-6 col-md-3"></div>
+			</div>
+			<p></p>
+			<div class="row col-centered">
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/fY8EKIrKjMk" frameborder="0" allowfullscreen class="other-centered"></iframe>		
+			</div>
+		</div>
+
+		<div class="container b">	
+			<div class="row col-centered">
+				<h2 class="center-text">Create Room</h2>
+				<h5 class="center-text">Insert room qualities and click "Create Room" to start a game session.</h5>
+			</div>
+			<div class="row">
+				<div class="col-xs-6 col-md-2"></div>
+				<div class="col-xs-12 col-md-8">
+					<div class="jumbotron">
+						<div class="row">
+							<p class="col-xs-6 col-md-3">Room Name:</p>
+							<div class="input-group col-xs-6 col-md-9">
+								<input type="text" class="form-control" aria-label="...">
+							</div>
+						</div>
+						<div class="row">
+							<p class="col-xs-6 col-md-3">Accessibility:</p>
+							<div class="input-group col-xs-6 col-md-9">
+						      <span class="input-group-addon">
+						        <div class="col-xs-6 col-md-6"><input type="radio" aria-label="..." >Public</div>
+						        <div class="col-xs-6 col-md-6"><input type="radio" aria-label="..." >Private</div>
+						      </span>
+						    </div>
+						</div>
+						<div class="row">
+							<p class="col-xs-6 col-md-3">Difficulty:</p>
+							<div class="input-group col-xs-6 col-md-9">
+						      <span class="input-group-addon">
+						        <div class="col-xs-4 col-md-4"><input type="radio" aria-label="..." >Easy</div>
+						        <div class="col-xs-4 col-md-4"><input type="radio" aria-label="..." >Medium</div>
+						        <div class="col-xs-4 col-md-4"><input type="radio" aria-label="..." >Hard</div>
+						      </span>
+						    </div>
+						</div>
+						<div class="row">
+							<button id="create_room" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+								Create Room
+							  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-2"></div>
+			</div>
+				
+		</div>
+
+		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script src="socket.io/socket.io.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+
+		<script>
+		$(document).ready(function(){
+			$('.b').hide();
+			$('#create_room').click(function(){
+				$('.a').hide();
+				$('.b').show();
+			});
+		});
+		</script>
+
+		<!-- USE THIS CODE TO PREVENT SCROLLING MOBILY
+		<script>
+		$(document).bind('touchmove', function(e) {
+			e.preventDefault();
+		});
+		</script>
+		-->
+	</body>
+</html>
