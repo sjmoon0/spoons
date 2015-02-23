@@ -13,6 +13,10 @@ jQuery
 
 ~~~~~~~~~~~~~~~~~ Versioning Documentation ~~~~~~~~~~~~~~~~~
 
+>2015.02.23:
+	Added static state C(Desktop-select room); fixed links to and from.
+	Fixed radio input options in state B
+
 >2015.02.16:
 	Initial Commit
 	Completed UI states A(Desktop-welcome) and B(Desktop-create room)

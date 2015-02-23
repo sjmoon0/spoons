@@ -29,26 +29,26 @@
 				<h5 class="center-text">Frostburg State University</h5>
 			</div>
 			<div class="row col-centered">
-				<div class="col-xs-6 col-md-3"></div>
-				<div class="col-xs-6 col-md-3">
-					<button id="view_rooms" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+				<div class="col-xs-12 col-md-3"></div>
+				<div class="col-xs-12 col-md-3">
+					<button id="a_view_rooms" type="button" class="btn btn-primary fill-width make-tall-fifty" aria-label="Left Align">
 						View Rooms
 					  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
 					</button>
 				</div>
-				<div class="col-xs-6 col-md-3">
-					<button id="create_room" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+				<div class="col-xs-12 col-md-3">
+					<button id="a_create_room" type="button" class="btn btn-primary fill-width make-tall-fifty" aria-label="Left Align">
 						Create Room
 					  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
 					</button>
 				</div>
-				<div class="col-xs-6 col-md-3"></div>
+				<div class="col-xs-12 col-md-3"></div>
 			</div>
 			<p></p>
 			<div class="row col-centered">
 				<iframe width="560" height="315" src="https://www.youtube.com/embed/fY8EKIrKjMk" frameborder="0" allowfullscreen class="other-centered"></iframe>		
 			</div>
-		</div>
+		</div> <!-- End State A -->
 
 		<div class="container b">	
 			<div class="row col-centered">
@@ -69,8 +69,12 @@
 							<p class="col-xs-6 col-md-3">Accessibility:</p>
 							<div class="input-group col-xs-6 col-md-9">
 						      <span class="input-group-addon">
-						        <div class="col-xs-6 col-md-6"><input type="radio" aria-label="..." >Public</div>
-						        <div class="col-xs-6 col-md-6"><input type="radio" aria-label="..." >Private</div>
+						    	<label class="radio-inline">
+								  <input type="radio" name="accessibility-options" id="access1" value="option1"> Public
+								</label>
+								<label class="radio-inline">
+								  <input type="radio" name="accessibility-options" id="access2" value="option2"> Private
+								</label>
 						      </span>
 						    </div>
 						</div>
@@ -78,24 +82,79 @@
 							<p class="col-xs-6 col-md-3">Difficulty:</p>
 							<div class="input-group col-xs-6 col-md-9">
 						      <span class="input-group-addon">
-						        <div class="col-xs-4 col-md-4"><input type="radio" aria-label="..." >Easy</div>
-						        <div class="col-xs-4 col-md-4"><input type="radio" aria-label="..." >Medium</div>
-						        <div class="col-xs-4 col-md-4"><input type="radio" aria-label="..." >Hard</div>
+						        <label class="radio-inline">
+								  <input type="radio" name="difficulty-options" id="diff1" value="option1"> Easy
+								</label>
+								<label class="radio-inline">
+								  <input type="radio" name="difficulty-options" id="diff2" value="option2"> Medium
+								</label>
+								<label class="radio-inline">
+								  <input type="radio" name="difficulty-options" id="diff3" value="option3"> Hard
+								</label>
 						      </span>
 						    </div>
 						</div>
 						<div class="row">
-							<button id="create_room" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
-								Create Room
-							  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+							<button id="b_create_room" type="button" class="btn btn-success fill-width make-tall-fifty" aria-label="Left Align">
+								Create and Join Room
+							  <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
 							</button>
 						</div>
 					</div>
 				</div>
 				<div class="col-xs-6 col-md-2"></div>
+			</div>	
+		</div> <!-- End state B-->
+
+		<div class="container c">	
+			<div class="row col-centered">
+				<h2 class="center-text">Join Room</h2>
+				<h5 class="center-text">Please select a public room to join a game session.</h5>
 			</div>
-				
-		</div>
+			<div class="row">
+				<div class="col-xs-6 col-md-2"></div>
+				<div class="col-xs-12 col-md-8">
+					<div class="jumbotron">
+						<div class="panel panel-default">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th>Room Name</th>
+										<th>Availability</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Room 1</td>
+										<td>3/12</td>
+										<td><button type="button" class="btn btn-success fill-width" aria-label="Left Align">Join
+								  			<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></button></td>
+									</tr>
+									<tr>
+										<td>Room 2</td>
+										<td>7/12</td>
+										<td><button type="button" class="btn btn-success fill-width" aria-label="Left Align">Join
+								  			<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></button></td>
+									</tr>
+									<tr>
+										<td>Room 3</td>
+										<td>8/12</td>
+										<td><button type="button" class="btn btn-success fill-width" aria-label="Left Align">Join
+								  			<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></button></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<button id="c_create_room" type="button" class="btn btn-primary fill-width make-tall-fifty" aria-label="Left Align">
+							Create Room
+						  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+						</button>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-2"></div>
+			</div>	
+		</div> <!-- End state C-->
 
 		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<script src="socket.io/socket.io.js"></script>
@@ -104,10 +163,24 @@
 
 		<script>
 		$(document).ready(function(){
+			// Uncomment/comment for development and testing 
+			//$('.a').hide();
 			$('.b').hide();
-			$('#create_room').click(function(){
+			$('.c').hide();
+			$('#a_view_rooms').click(function(){
+				$('.a').hide();
+				$('.b').hide();
+				$('.c').show();
+			});
+			$('#a_create_room').click(function(){
 				$('.a').hide();
 				$('.b').show();
+				$('.c').hide();
+			});
+			$('#c_create_room').click(function(){
+				$('.a').hide();
+				$('.b').show();
+				$('.c').hide();
 			});
 		});
 		</script>
