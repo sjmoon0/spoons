@@ -36,3 +36,33 @@ h1{
 .make-tall-fifty{
 	height:50px;
 }
+
+.centerme{
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    text-align: center;
+    position: relative;
+}
+
+.m4top{
+	height:20%;
+	background-color: #6CFF01;
+}
+.m4mid{
+	height:60%;
+	background-color: #5F2CBC;
+}
+.m4bot{
+	height:20%;
+	background-color: #FF9108;
+}
+
+.m4tq{
+	width:25%;
+	height: 100%;
+	float: left;
+	border: 1px solid red;
+}

@@ -1,1 +1,229 @@
-<h1>HELLO MOBILE</h1>
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<link rel="stylesheet" href="http://131.118.95.193/thesis/style.css">
+		<link href='http://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	</head>
+	<body>
+		<div class="container m1">	
+			<div class="row col-centered">
+				<h1 class="center-text">Spoons</h1>
+				<h5 class="center-text">A game developed by Steven Moon</h5>
+				<h5 class="center-text">Frostburg State University</h5>
+			</div>
+			<div class="row col-centered">
+				<div class="col-xs-12 col-md-3"></div>
+				
+				<div class="form-group has-success has-feedback">
+			        <label class="control-label" for="inputSuccess4">Room to join:</label>
+			        <input type="text" class="form-control" id="inputSuccess4" aria-describedby="inputSuccess4Status">
+			        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+			        <span id="inputSuccess4Status" class="sr-only">(success)</span>
+			    </div>
+				<div class="form-group has-success has-feedback">
+			        <label class="control-label" for="inputSuccess5">User Name:</label>
+			        <input type="text" class="form-control" id="inputSuccess5" aria-describedby="inputSuccess5Status">
+			        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+			        <span id="inputSuccess5Status" class="sr-only">(success)</span>
+			    </div>
+
+				<button id="m1_join_room" type="button" class="btn btn-primary fill-width make-tall-fifty" aria-label="Left Align">
+					Join Room
+				  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+				</button>
+				
+				<div class="col-xs-12 col-md-3"></div>
+			</div>
+			<p></p>
+			<div class="row col-centered">
+				<div class="col-xs-12 col-md-3">
+					<a id="adv_settings" href="#">Advanced Settings...</a>
+					<button id="m1_use_as_desktop" type="button" class="btn btn-warning fill-width make-tall-fifty" aria-label="Left Align">
+						Use as Desktop
+					  <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
+					</button>
+				</div>
+			</div>
+		</div> <!-- End State m1 -->
+
+		<div class="container m2">
+			<div class="row col-centered">
+				<img src="http://131.118.95.193/thesis/loading.gif" class="img-responsive" alt="Responsive image">
+			</div>
+			<div class="row col-centered">
+				<h3 class="center-text">Waiting for additional players...</h3>
+			</div>
+			<div class="row col-centered">
+				<button id="m2_instructions" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+						View Instructions
+				  <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+				</button>
+			</div>
+		</div><!-- End State m2 -->
+
+		<div class="container m3">
+			<p></p>
+			<div class="row other-centered">
+				<canvas id="piechart" class="centerme" width="250" height="250">
+				</canvas>
+			</div>
+			<div class="row col-centered">
+				<h3 id="start_feedback" class="center-text">Press Play to start game...</h3>
+			</div>
+			<div class="row col-centered">
+				<div class="col-xs-12 col-md-3"></div>
+				<div class="col-xs-12 col-md-6">
+					<button id="m3_play_game" type="button" class="btn btn-success fill-width make-tall-fifty" aria-label="Left Align">
+							Play Game
+					  <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+					</button>
+				</div>
+				<div class="col-xs-12 col-md-3"></div>
+			</div>
+			<div class="row col-centered">
+				<div class="col-xs-12 col-md-3"></div>
+				<div class="col-xs-12 col-md-6">
+					<button id="m2_instructions" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+							View Instructions
+					  <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+					</button>
+				</div>
+				<div class="col-xs-12 col-md-3"></div>
+			</div>
+		</div><!-- End State m3 -->
+
+		<div class="m4">
+			<div class="m4top">
+				<div class="m4tq"></div>
+				<div class="m4tq"></div>
+				<div class="m4tq"></div>
+				<div class="m4tq"></div>
+			</div>
+			<div class="m4mid"></div>
+			<div class="m4bot"></div>
+		</div><!-- End State m4 -->
+		
+		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script src="socket.io/socket.io.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<script src="http://131.118.95.193/thesis/piechart.js"></script>
+		<script>
+		// kick things off
+		//window.onload = createPieChart;
+		function createPieChart(ia,lab) {
+			//
+			// create a PieChart.
+			// 
+			var temp=[];
+			var sum=0;
+			var sum2=0;
+			var i=0;
+			for(i=0;i<ia.length;i++){
+				sum+=ia[i];
+			}
+
+			for(i=0;i<ia.length;i++){
+				if(i==ia.length-1){
+					temp[temp.length]=(360-sum2);
+				}
+				else{
+					temp[temp.length]=(Math.floor(360*(ia[i]/sum)));
+					sum2+=temp[temp.length-1];
+				}
+			}
+
+			var pieChart = new PieChart( "piechart", 
+				{
+					includeLabels: true, 
+					data: temp,
+					labels: lab,
+					colors: [
+		            	["#6CFF01", "#6CFF01"],
+		            	["#03BD03", "#03BD03"],
+		            	["#00E5AD", "#00E5AD"],
+		            	["#0200C3", "#0200C3"],
+		            	["#5F2CBC", "#5F2CBC"],
+		            	["#A619AC", "#A619AC"],
+		            	["#E60491", "#E60491"],
+		            	["#D50000", "#D50000"],
+		            	["#FF9108", "#FF9108"],
+		            	["#FFEE00", "#FFEE00"]
+					]
+				}
+			);
+			//
+			// nothing appears until you call draw().
+			//
+			pieChart.draw();
+		/*
+		 * If you want to draw the labels separately, you can set
+		 * includeLabels to false, and call drawLabel() for each
+		 * pie chart segment.
+		 *
+			for (var i = 0; i < pieChart.labels.length; i++) {
+				pieChart.drawLabel(i);
+			}
+		 */
+		/*
+		 * If you want to select a segment to highight it, you can
+		 * call select() for a given segment. Here's a little snippet
+		 * that animates selecting each segment.
+		 *
+			var segment = 0;
+			function nextSegment() {
+				pieChart.select(segment);
+				segment++;
+				if (segment < pieChart.data.length) {
+					setTimeout(nextSegment, 1000);
+				}
+			}
+			setTimeout(nextSegment, 1000);
+		 */
+		}
+		</script>
+
+
+		<script>
+		$("#m1_use_as_desktop").hide();
+		$(".m1").hide();
+		$(".m2").hide();
+		$(".m3").hide();
+		//$(".m4").hide();
+		$(document).bind('touchmove', function(e) {
+			e.preventDefault();
+		});
+		var tog=true;
+		$("#adv_settings").click(function(){
+			tog=!tog;
+			if(tog){
+				$("#m1_use_as_desktop").hide();
+				$("#adv_settings").html("Advanced Settings...");
+			}
+			else{
+			$("#m1_use_as_desktop").show();
+				$("#adv_settings").html("Hide Settings...");
+			}
+		});
+
+		$("#m1_join_room").click(function(){
+			$(".m1").hide();
+			$(".m2").show();
+		});
+
+		$("#m3_play_game").click(function(){
+			$("#start_feedback").html("Waiting for other players to start...");
+			$("#m3_play_game").hide();
+		});
+
+		$(document).ready(function(){
+			var ia=[1,1,1,1,1,1,1,1,1,1];
+			var lab=["aaaaaaaaa", "bbbbbb", "cccccccccccccc","dddddd","eeeeeeeee","ffffffff","gggggggg","hhhhhh","iiiii","jjjjjjjj"];
+			createPieChart(ia,lab);
+		});
+		</script>
+
+	</body>
+
+
+</html>
