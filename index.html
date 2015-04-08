@@ -22,7 +22,7 @@
 			<input type="submit"></input>
 		</form>
 		-->
-		<div class="container a">	
+		<div class="container state a">	
 			<div class="row col-centered">
 				<h1 class="center-text">Spoons</h1>
 				<h5 class="center-text">A game developed by Steven Moon</h5>
@@ -50,7 +50,7 @@
 			</div>
 		</div> <!-- End State A -->
 
-		<div class="container b">	
+		<div class="container state b">	
 			<div class="row col-centered">
 				<h2 class="center-text">Create Room</h2>
 				<h5 class="center-text">Insert room qualities and click "Create Room" to start a game session.</h5>
@@ -62,7 +62,7 @@
 						<div class="row">
 							<p class="col-xs-6 col-md-3">Room Name:</p>
 							<div class="input-group col-xs-6 col-md-9">
-								<input type="text" class="form-control" aria-label="...">
+								<input id="b_room_name" type="text" class="form-control" aria-label="...">
 							</div>
 						</div>
 						<div class="row">
@@ -106,7 +106,7 @@
 			</div>	
 		</div> <!-- End state B-->
 
-		<div class="container c">	
+		<div class="container state c">	
 			<div class="row col-centered">
 				<h2 class="center-text">Join Room</h2>
 				<h5 class="center-text">Please select a public room to join a game session.</h5>
@@ -124,7 +124,7 @@
 										<th></th>
 									</tr>
 								</thead>
-								<tbody>
+								<tbody id="c_room_list">
 									<tr>
 										<td>Room 1</td>
 										<td>3/12</td>
@@ -150,11 +150,45 @@
 							Create Room
 						  <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
 						</button>
+						<button id="c_room_login" type="button" class="btn btn-secondary fill-width make-tall-fifty" aria-label="Left Align">
+							Join Private Room
+						  <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+						</button>
 					</div>
 				</div>
 				<div class="col-xs-6 col-md-2"></div>
+			</div>
+			<!-- Modal -->
+			<div class="modal fade" id="c_turnModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <!--<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>-->
+			        <h4 class="modal-title" id="myModalLabel">Please Enter name of room to enter</h4>
+			      </div>
+			      <div id="modalBody"class="modal-body">
+			        <div class="input-group col-xs-6 col-md-9">
+						<input id="c_room_name" type="text" class="form-control" aria-label="...">
+					</div>
+			      </div>
+			      <div id="modalFooter"class="modal-footer">
+			        <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="button" class="btn btn-primary">Save changes</button>-->
+			        <button id='c_joinRoom'type='button' class='btn btn-primary customButton'>Join Room</button>
+			        <button id='c_okCloseButton'type="button" class="btn btn-default customButton" data-dismiss="modal">Back</button>
+			        </div>
+			    </div>
+			  </div>
 			</div>	
 		</div> <!-- End state C-->
+
+		<div class="container state d">
+			<div class="row col-centered">
+				<h2 class="center-text">In Room:<a id="d_room_name">default</a></h2>
+			</div>
+
+			
+		</div>
 
 		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<script src="socket.io/socket.io.js"></script>
@@ -162,27 +196,90 @@
 
 
 		<script>
+		var socket = io('http://131.118.95.193:3000');
+		var listRefreshTimer;
+		var roomName='';
+		//~~~~~~~~~~~~~~~~~~~~~~jQuery~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		$(document).ready(function(){
-			// Uncomment/comment for development and testing 
-			//$('.a').hide();
-			$('.b').hide();
-			$('.c').hide();
+			//refreshRoomListLoop()
+			goToState('a');
 			$('#a_view_rooms').click(function(){
-				$('.a').hide();
-				$('.b').hide();
-				$('.c').show();
+				goToState('c');
+				socket.emit('get room list');
 			});
 			$('#a_create_room').click(function(){
-				$('.a').hide();
-				$('.b').show();
-				$('.c').hide();
+				goToState('b');
 			});
 			$('#c_create_room').click(function(){
-				$('.a').hide();
-				$('.b').show();
-				$('.c').hide();
+				goToState('b');
+			});
+			$('#b_create_room').click(function(){
+				var newRoom={
+					name:$('#b_room_name').val(),
+					capacity:12,
+					occupancy:1
+				}
+				socket.emit('create room',newRoom);
+			});
+			$('#c_room_login').click(function(){
+				$('#c_turnModal').modal('show');
+			});
+			$('#c_joinRoom').click(function(){
+				socket.emit('view room',$('#c_room_name').val());
+			});
+			$(document).on('click',".c_public_room_choice",function(){
+				console.log("Bloody ell!");
+				socket.emit('view room',$(this).val());
 			});
 		});
+		
+		function goToState(st){
+			$('.state').hide();
+			$('.'+st).show();
+		}
+		
+		function refreshRoomList(rArray){
+			if(rArray.length==0 || rArray==null){
+				$('#c_room_list').html("<p>There are no rooms to display</p>");
+			}
+			else{
+				$('#c_room_list').empty();
+			}
+			for(var i=0;i<rArray.length;++i){
+				$('#c_room_list').append('<tr><td><a href="#" id="c_rm_'+rArray[i].name+'" value="'+rArray[i].name+'">'+rArray[i].name+'</a></td><td>'+rArray[i].occupancy+'/'+rArray[i].capacity+'</td><td><a id="c_bt_'+rArray[i].name+'"><button type="button" class="btn btn-success fill-width" aria-label="Left Align">Join<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></button></a></td></tr>');
+				//console.log(rArray[i]);
+				$('#c_rm_'+rArray[i].name).addClass("c_public_room_choice");
+				$('#c_bt_'+rArray[i].name).addClass("c_public_room_choice");
+				$('#c_rm_'+rArray[i].name).val(rArray[i].name);
+				$('#c_bt_'+rArray[i].name).val(rArray[i].name);
+			}
+		}
+		
+		function refreshRoomListLoop(){
+			socket.emit('get room list');
+			listRefreshTimer=setTimeout(function(){
+				refreshRoomListLoop();
+			},2000);
+		}
+		
+		//~~~~~~~~~~~~~~~~~~~~Event Driven Networking~~~~~~~~~~~~~~~~
+		socket.on('test1', function (data) {
+			console.log("Aw yeah in room:"+data);
+			//socket.emit('my other event', { my: 'data' });
+		});
+		
+		socket.on('refresh room list',function(rArray){
+			refreshRoomList(rArray);
+		});
+
+		socket.on('room created',function(roomInfo){
+			console.log("Viewing room: "+roomInfo.name);
+			//$('#c_turnModal').modal('hide');
+			goToState('d');
+			$('#d_room_name').html(roomInfo.name);
+			roomName=roomInfo.name;
+		});
+		
 		</script>
 
 		<!-- USE THIS CODE TO PREVENT SCROLLING MOBILY
