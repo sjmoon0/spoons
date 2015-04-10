@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	</head>
 	<body>
-		<div class="container m1">	
+		<div class="container state m1">	
 			<div class="row col-centered">
 				<h1 class="center-text">Spoons</h1>
 				<h5 class="center-text">A game developed by Steven Moon</h5>
@@ -17,13 +17,13 @@
 				
 				<div class="form-group has-success has-feedback">
 			        <label class="control-label" for="inputSuccess4">Room to join:</label>
-			        <input type="text" class="form-control" id="inputSuccess4" aria-describedby="inputSuccess4Status">
+			        <input type="text" class="form-control" id="m1_room_name" aria-describedby="inputSuccess4Status">
 			        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
 			        <span id="inputSuccess4Status" class="sr-only">(success)</span>
 			    </div>
 				<div class="form-group has-success has-feedback">
 			        <label class="control-label" for="inputSuccess5">User Name:</label>
-			        <input type="text" class="form-control" id="inputSuccess5" aria-describedby="inputSuccess5Status">
+			        <input type="text" class="form-control" id="m1_user_name" aria-describedby="inputSuccess5Status">
 			        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
 			        <span id="inputSuccess5Status" class="sr-only">(success)</span>
 			    </div>
@@ -47,7 +47,7 @@
 			</div>
 		</div> <!-- End State m1 -->
 
-		<div class="container m2">
+		<div class="container state m2">
 			<div class="row col-centered">
 				<img src="http://131.118.95.193/thesis/loading.gif" class="img-responsive" alt="Responsive image">
 			</div>
@@ -62,7 +62,7 @@
 			</div>
 		</div><!-- End State m2 -->
 
-		<div class="container m3">
+		<div class="container state m3">
 			<p></p>
 			<div class="row other-centered">
 				<canvas id="piechart" class="centerme" width="250" height="250">
@@ -93,7 +93,7 @@
 			</div>
 		</div><!-- End State m3 -->
 
-		<div class="m4">
+		<div class="state m4">
 			<div class="m4top">
 				<div class="m4tq"></div>
 				<div class="m4tq"></div>
@@ -109,12 +109,12 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 		<script src="http://131.118.95.193/thesis/piechart.js"></script>
 		<script>
-		// kick things off
-		//window.onload = createPieChart;
+		var socket = io('http://131.118.95.193:3000');
+		var currRoom='';
+		var userName='';
+		var tog=true;
+
 		function createPieChart(ia,lab) {
-			//
-			// create a PieChart.
-			// 
 			var temp=[];
 			var sum=0;
 			var sum2=0;
@@ -122,7 +122,6 @@
 			for(i=0;i<ia.length;i++){
 				sum+=ia[i];
 			}
-
 			for(i=0;i<ia.length;i++){
 				if(i==ia.length-1){
 					temp[temp.length]=(360-sum2);
@@ -132,95 +131,121 @@
 					sum2+=temp[temp.length-1];
 				}
 			}
-
 			var pieChart = new PieChart( "piechart", 
 				{
 					includeLabels: true, 
 					data: temp,
 					labels: lab,
 					colors: [
-		            	["#6CFF01", "#6CFF01"],
-		            	["#03BD03", "#03BD03"],
-		            	["#00E5AD", "#00E5AD"],
-		            	["#0200C3", "#0200C3"],
-		            	["#5F2CBC", "#5F2CBC"],
-		            	["#A619AC", "#A619AC"],
-		            	["#E60491", "#E60491"],
-		            	["#D50000", "#D50000"],
-		            	["#FF9108", "#FF9108"],
-		            	["#FFEE00", "#FFEE00"]
+		            	["#D50000", "#D50000"],//red
+		            	["#6CFF01", "#6CFF01"]
+		            	//["#03BD03", "#03BD03"],
+		            	//["#00E5AD", "#00E5AD"],
+		            	//["#0200C3", "#0200C3"],
+		            	//["#5F2CBC", "#5F2CBC"],
+		            	//["#A619AC", "#A619AC"],
+		            	//["#E60491", "#E60491"],
+		            	//["#FF9108", "#FF9108"],
+		            	//["#FFEE00", "#FFEE00"]
 					]
 				}
 			);
-			//
-			// nothing appears until you call draw().
-			//
 			pieChart.draw();
-		/*
-		 * If you want to draw the labels separately, you can set
-		 * includeLabels to false, and call drawLabel() for each
-		 * pie chart segment.
-		 *
-			for (var i = 0; i < pieChart.labels.length; i++) {
-				pieChart.drawLabel(i);
-			}
-		 */
-		/*
-		 * If you want to select a segment to highight it, you can
-		 * call select() for a given segment. Here's a little snippet
-		 * that animates selecting each segment.
-		 *
-			var segment = 0;
-			function nextSegment() {
-				pieChart.select(segment);
-				segment++;
-				if (segment < pieChart.data.length) {
-					setTimeout(nextSegment, 1000);
-				}
-			}
-			setTimeout(nextSegment, 1000);
-		 */
 		}
 		</script>
 
 
 		<script>
-		$("#m1_use_as_desktop").hide();
-		$(".m1").hide();
-		$(".m2").hide();
-		$(".m3").hide();
-		//$(".m4").hide();
-		$(document).bind('touchmove', function(e) {
-			e.preventDefault();
-		});
-		var tog=true;
-		$("#adv_settings").click(function(){
-			tog=!tog;
-			if(tog){
-				$("#m1_use_as_desktop").hide();
-				$("#adv_settings").html("Advanced Settings...");
-			}
-			else{
-			$("#m1_use_as_desktop").show();
-				$("#adv_settings").html("Hide Settings...");
-			}
+
+		$(document).ready(function(){
+			goToState(1);
+			$("#m1_use_as_desktop").hide();
+
+			$(document).bind('touchmove', function(e) {
+				e.preventDefault();
+			});
+			$("#adv_settings").click(function(){
+				tog=!tog;
+				if(tog){
+					$("#m1_use_as_desktop").hide();
+					$("#adv_settings").html("Advanced Settings...");
+				}
+				else{
+				$("#m1_use_as_desktop").show();
+					$("#adv_settings").html("Hide Settings...");
+				}
+			});
+
+			$("#m1_join_room").click(function(){
+				socket.emit('player login',{name:$('#m1_user_name').val(),rname:$('#m1_room_name').val()});
+			});
+
+			$("#m3_play_game").click(function(){
+				socket.emit('player clicked ready',{un:userName,rm:currRoom});
+			});
 		});
 
-		$("#m1_join_room").click(function(){
-			$(".m1").hide();
-			$(".m2").show();
+		function goToState(st){
+			$('.state').hide();
+			$('.m'+st).show();
+		}
+
+		//~~~~~~~~~~~~~~~~~~~~Event Driven Networking~~~~~~~~~~~~~~~~
+
+		socket.on('test1', function (data) {
+			console.log("Aw yeah in room:"+data);
+			//socket.emit('my other event', { my: 'data' });
 		});
 
-		$("#m3_play_game").click(function(){
+		socket.on('first login success',function(roomInfo){
+			goToState(2);
+			var ia=[1];
+			var lab=["No Players Ready", "Ready"];
+			createPieChart(ia,lab);
+			//currRoom=roomInfo.name;
+		});
+
+		socket.on('subsequent login success',function(roomInfo){
+			goToState(3);
+			var readyToPlay=0;
+			for(var i=0;i<roomInfo.players.length;++i){
+				if(roomInfo.players[i].readyToPlay){
+					readyToPlay++;
+				}
+			}
+			var ia=[roomInfo.players.length-readyToPlay,readyToPlay];
+			var lab=["Not ready", "Ready"];
+			createPieChart(ia,lab);
+			//currRoom=roomInfo.name;
+		});
+
+		socket.on('register user',function(info){
+			userName=info.name;
+			currRoom=info.rname;
+			//alert('user: '+userName+' | room: '+currRoom);
+		});
+
+		socket.on('indiv player ready',function(){
 			$("#start_feedback").html("Waiting for other players to start...");
 			$("#m3_play_game").hide();
 		});
 
-		$(document).ready(function(){
-			var ia=[1,1,1,1,1,1,1,1,1,1];
-			var lab=["aaaaaaaaa", "bbbbbb", "cccccccccccccc","dddddd","eeeeeeeee","ffffffff","gggggggg","hhhhhh","iiiii","jjjjjjjj"];
+		socket.on('player ready',function(roomInfo){
+			var readyToPlay=0;
+			for(var i=0;i<roomInfo.players.length;++i){
+				if(roomInfo.players[i].readyToPlay){
+					readyToPlay++;
+				}
+			}
+			var ia=[roomInfo.players.length-readyToPlay,readyToPlay];
+			var lab=["Not ready", "Ready"];
 			createPieChart(ia,lab);
 		});
+
+		socket.on('all players ready',function(roomInfo){
+			goToState(4);
+		});
+
 		</script>
 
 	</body>

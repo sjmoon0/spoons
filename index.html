@@ -67,29 +67,29 @@
 						</div>
 						<div class="row">
 							<p class="col-xs-6 col-md-3">Accessibility:</p>
-							<div class="input-group col-xs-6 col-md-9">
+							<div id="b_access_choice" class="input-group col-xs-6 col-md-9">
 						      <span class="input-group-addon">
 						    	<label class="radio-inline">
-								  <input type="radio" name="accessibility-options" id="access1" value="option1"> Public
+								  <input type="radio" name="accessibility-options" id="access1" value="true"> Public
 								</label>
 								<label class="radio-inline">
-								  <input type="radio" name="accessibility-options" id="access2" value="option2"> Private
+								  <input type="radio" name="accessibility-options" id="access2" value="false"> Private
 								</label>
 						      </span>
 						    </div>
 						</div>
 						<div class="row">
 							<p class="col-xs-6 col-md-3">Difficulty:</p>
-							<div class="input-group col-xs-6 col-md-9">
+							<div id="b_diff_choice" class="input-group col-xs-6 col-md-9">
 						      <span class="input-group-addon">
 						        <label class="radio-inline">
-								  <input type="radio" name="difficulty-options" id="diff1" value="option1"> Easy
+								  <input type="radio" name="difficulty-options" id="diff1" value="easy"> Easy
 								</label>
 								<label class="radio-inline">
-								  <input type="radio" name="difficulty-options" id="diff2" value="option2"> Medium
+								  <input type="radio" name="difficulty-options" id="diff2" value="medium"> Medium
 								</label>
 								<label class="radio-inline">
-								  <input type="radio" name="difficulty-options" id="diff3" value="option3"> Hard
+								  <input type="radio" name="difficulty-options" id="diff3" value="hard"> Hard
 								</label>
 						      </span>
 						    </div>
@@ -164,14 +164,14 @@
 			    <div class="modal-content">
 			      <div class="modal-header">
 			        <!--<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>-->
-			        <h4 class="modal-title" id="myModalLabel">Please Enter name of room to enter</h4>
+			        <h4 class="modal-title" id="c_myModalLabel">Please Enter name of room to enter</h4>
 			      </div>
-			      <div id="modalBody"class="modal-body">
+			      <div id="c_modalBody"class="modal-body">
 			        <div class="input-group col-xs-6 col-md-9">
 						<input id="c_room_name" type="text" class="form-control" aria-label="...">
 					</div>
 			      </div>
-			      <div id="modalFooter"class="modal-footer">
+			      <div id="c_modalFooter"class="modal-footer">
 			        <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			        <button type="button" class="btn btn-primary">Save changes</button>-->
 			        <button id='c_joinRoom'type='button' class='btn btn-primary customButton'>Join Room</button>
@@ -186,17 +186,108 @@
 			<div class="row col-centered">
 				<h2 class="center-text">In Room:<a id="d_room_name">default</a></h2>
 			</div>
-
-			
+			<div class="row col-centered">
+				<div class="col-xs-6 col-md-4"></div>
+				<div class="col-xs-12 col-md-4">
+					<button id="d_join_instr" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+						How to add Players
+					  <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+					</button>
+				</div>
+				<div class="col-xs-6 col-md-4"></div>
+			</div>
+			<br>
+			<div class="row other-centered">
+				<canvas id="piechart" class="centerme" width="250" height="250">
+				</canvas>
+			</div>
+			<br>
+			<div class="row col-centered">
+				<div class="col-xs-6 col-md-3"></div>
+				<div class="col-xs-12 col-md-6">
+					<div class="jumbotron">
+						<h4 class="center-text">Player List</h4>
+						<table id="d_player_list" class='table table-striped'>
+							<thead><tr><th>Username</th><th>Ready?</th></tr></thead>
+							<tbody><tr><th>joe</th><th>no</th></tr></tbody>
+							<tbody><tr><th>joe</th><th>no</th></tr></tbody>
+						</table>
+					</div>
+				</div>
+				<div class="col-xs-6 col-md-3"></div>
+			</div>
+			<!-- Modal -->
+			<div class="modal fade" id="d_joinInstr" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <!--<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>-->
+			        <h4 class="modal-title" id="d_myModalLabel">To add players to game:</h4>
+			      </div>
+			      <div id="d_modalBody"class="modal-body">
+			      	<p>Navigate to <a href="http://131.118.95.193:3000">131.118.95.193:3000</a> with a mobile device.</p>
+			      	<p>Insert the name of the room and a username into the provided form. Click "Join Room"</p>
+			      	<p>Wait until all players login and are ready to start the game.</p>
+			      </div>
+			      <div id="d_modalFooter"class="modal-footer">
+			        <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button type="button" class="btn btn-primary">Save changes</button>-->
+			        <button id='d_okCloseButton'type="button" class="btn btn-default customButton" data-dismiss="modal">Back</button>
+			        </div>
+			    </div>
+			  </div>
+			</div>	
 		</div>
 
 		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<script src="socket.io/socket.io.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-
+		<script src="http://131.118.95.193/thesis/piechart.js"></script>
+		<script>
+		// kick things off
+		//window.onload = createPieChart;
+		function createPieChart(ia,lab) {
+			var temp=[];
+			var sum=0;
+			var sum2=0;
+			var i=0;
+			for(i=0;i<ia.length;i++){
+				sum+=ia[i];
+			}
+			for(i=0;i<ia.length;i++){
+				if(i==ia.length-1){
+					temp[temp.length]=(360-sum2);
+				}
+				else{
+					temp[temp.length]=(Math.floor(360*(ia[i]/sum)));
+					sum2+=temp[temp.length-1];
+				}
+			}
+			var pieChart = new PieChart( "piechart", 
+				{
+					includeLabels: true, 
+					data: temp,
+					labels: lab,
+					colors: [
+		            	["#D50000", "#D50000"],//red
+		            	["#6CFF01", "#6CFF01"]
+		            	//["#03BD03", "#03BD03"],
+		            	//["#00E5AD", "#00E5AD"],
+		            	//["#0200C3", "#0200C3"],
+		            	//["#5F2CBC", "#5F2CBC"],
+		            	//["#A619AC", "#A619AC"],
+		            	//["#E60491", "#E60491"],
+		            	//["#FF9108", "#FF9108"],
+		            	//["#FFEE00", "#FFEE00"]
+					]
+				}
+			);
+			pieChart.draw();
+		}
+		</script>
 
 		<script>
-		var socket = io('http://131.118.95.193:3000');
+		var socket = io.connect('http://131.118.95.193:3000');
 		var listRefreshTimer;
 		var roomName='';
 		//~~~~~~~~~~~~~~~~~~~~~~jQuery~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,12 +308,16 @@
 				var newRoom={
 					name:$('#b_room_name').val(),
 					capacity:12,
-					occupancy:1
+					accessibility:$('#b_access_choice input:radio:checked').val(),
+					difficulty:$('#b_diff_choice input:radio:checked').val()
 				}
 				socket.emit('create room',newRoom);
 			});
 			$('#c_room_login').click(function(){
 				$('#c_turnModal').modal('show');
+			});
+			$('#d_join_instr').click(function(){
+				$('#d_joinInstr').modal('show');
 			});
 			$('#c_joinRoom').click(function(){
 				socket.emit('view room',$('#c_room_name').val());
@@ -246,7 +341,7 @@
 				$('#c_room_list').empty();
 			}
 			for(var i=0;i<rArray.length;++i){
-				$('#c_room_list').append('<tr><td><a href="#" id="c_rm_'+rArray[i].name+'" value="'+rArray[i].name+'">'+rArray[i].name+'</a></td><td>'+rArray[i].occupancy+'/'+rArray[i].capacity+'</td><td><a id="c_bt_'+rArray[i].name+'"><button type="button" class="btn btn-success fill-width" aria-label="Left Align">Join<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></button></a></td></tr>');
+				$('#c_room_list').append('<tr><td><a href="#" id="c_rm_'+rArray[i].name+'" value="'+rArray[i].name+'">'+rArray[i].name+'</a></td><td>'+rArray[i].players.length+'/'+rArray[i].capacity+'</td><td><a id="c_bt_'+rArray[i].name+'"><button type="button" class="btn btn-success fill-width" aria-label="Left Align">Join<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></button></a></td></tr>');
 				//console.log(rArray[i]);
 				$('#c_rm_'+rArray[i].name).addClass("c_public_room_choice");
 				$('#c_bt_'+rArray[i].name).addClass("c_public_room_choice");
@@ -254,13 +349,34 @@
 				$('#c_bt_'+rArray[i].name).val(rArray[i].name);
 			}
 		}
-		
+
+		function refreshPlayerList(pArray){
+			if(pArray.length==0 || pArray==null){
+				$('#d_player_list').html("<p>There are no users in this room</p>");
+			}
+			else{
+				$('#d_player_list').empty();
+				$('#d_player_list').append("<thead><tr><th>Username</th><th>Ready?</th></tr></thead>");
+			}
+			for(var i=0;i<pArray.length;++i){
+				var status;
+				if(pArray[i].readyToPlay){
+					status="<a style='color:green'>Yes</a>";
+				}
+				else{
+					status="<a style='color:red'>No</a>";
+				}
+				$('#d_player_list').append("<thead><tr><th>"+pArray[i].name+"</th><th>"+status+"</th></tr></thead>");
+			}
+		}
+		/*
 		function refreshRoomListLoop(){
 			socket.emit('get room list');
 			listRefreshTimer=setTimeout(function(){
 				refreshRoomListLoop();
 			},2000);
 		}
+		*/
 		
 		//~~~~~~~~~~~~~~~~~~~~Event Driven Networking~~~~~~~~~~~~~~~~
 		socket.on('test1', function (data) {
@@ -276,8 +392,47 @@
 			console.log("Viewing room: "+roomInfo.name);
 			//$('#c_turnModal').modal('hide');
 			goToState('d');
+			var ia=[1];
+			var lab=["No Players Ready", "ready"];
+			createPieChart(ia,lab);
 			$('#d_room_name').html(roomInfo.name);
 			roomName=roomInfo.name;
+			refreshPlayerList([]);
+		});
+
+		socket.on('first login success',function(roomInfo){
+			refreshPlayerList(roomInfo.players);
+		});
+
+		socket.on('subsequent login success',function(roomInfo){
+			//alert("another person logged in");
+			var readyToPlay=0;
+			for(var i=0;i<roomInfo.players.length;++i){
+				if(roomInfo.players[i].readyToPlay){
+					readyToPlay++;
+				}
+			}
+			var ia=[roomInfo.players.length-readyToPlay,readyToPlay];
+			var lab=["Not ready", "Ready"];
+			createPieChart(ia,lab);
+			refreshPlayerList(roomInfo.players);
+		});
+
+		socket.on('player ready',function(roomInfo){
+			var readyToPlay=0;
+			for(var i=0;i<roomInfo.players.length;++i){
+				if(roomInfo.players[i].readyToPlay){
+					readyToPlay++;
+				}
+			}
+			var ia=[roomInfo.players.length-readyToPlay,readyToPlay];
+			var lab=["Not ready", "Ready"];
+			createPieChart(ia,lab);
+			refreshPlayerList(roomInfo.players);
+		});
+
+		socket.on('all players ready',function(roomInfo){
+			goToState('e');
 		});
 		
 		</script>
