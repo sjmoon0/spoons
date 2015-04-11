@@ -100,6 +100,9 @@
 							  <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
 							</button>
 						</div>
+						<div class="row">
+							<p id="b_feedback" style='color:red'></p>
+						</div>
 					</div>
 				</div>
 				<div class="col-xs-6 col-md-2"></div>
@@ -174,9 +177,11 @@
 			      <div id="c_modalFooter"class="modal-footer">
 			        <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			        <button type="button" class="btn btn-primary">Save changes</button>-->
+			        <p id="c_feedback" style='color:red'></p>
 			        <button id='c_joinRoom'type='button' class='btn btn-primary customButton'>Join Room</button>
 			        <button id='c_okCloseButton'type="button" class="btn btn-default customButton" data-dismiss="modal">Back</button>
 			        </div>
+					
 			    </div>
 			  </div>
 			</div>	
@@ -305,13 +310,15 @@
 				goToState('b');
 			});
 			$('#b_create_room').click(function(){
-				var newRoom={
-					name:$('#b_room_name').val(),
-					capacity:12,
-					accessibility:$('#b_access_choice input:radio:checked').val(),
-					difficulty:$('#b_diff_choice input:radio:checked').val()
+				if(validateB()){
+					var newRoom={
+						name:$('#b_room_name').val(),
+						capacity:12,
+						accessibility:$('#b_access_choice input:radio:checked').val(),
+						difficulty:$('#b_diff_choice input:radio:checked').val()
+					}
+					socket.emit('create room',newRoom);
 				}
-				socket.emit('create room',newRoom);
 			});
 			$('#c_room_login').click(function(){
 				$('#c_turnModal').modal('show');
@@ -320,7 +327,9 @@
 				$('#d_joinInstr').modal('show');
 			});
 			$('#c_joinRoom').click(function(){
-				socket.emit('view room',$('#c_room_name').val());
+				if(validateC()){
+					socket.emit('view room',$('#c_room_name').val());
+				}
 			});
 			$(document).on('click',".c_public_room_choice",function(){
 				console.log("Bloody ell!");
@@ -332,6 +341,31 @@
 			$('.state').hide();
 			$('.'+st).show();
 		}
+
+		function validateB(){
+			if($('#b_room_name').val()==''||$('#b_room_name').val()==null){
+				$('#b_feedback').html('Please provide a room name');
+				return false;
+			}
+			console.log("oh yah -->"+$('#b_access_choice input:radio:checked').val());
+			if($('#b_access_choice input:radio:checked').val()==null){
+				$('#b_feedback').html('Please select an accessibility option');
+				return false;
+			}
+			if($('#b_diff_choice input:radio:checked').val()==null){
+				$('#b_feedback').html('Please select an difficulty option');
+				return false;
+			}
+			return true;
+		}
+
+		function validateC(){
+			if($('#c_room_name').val()==''||$('#c_room_name').val()==null){
+				$('#c_feedback').html('Please provide a room name');
+				return false;
+			}
+			return true;
+		}
 		
 		function refreshRoomList(rArray){
 			if(rArray.length==0 || rArray==null){
@@ -341,7 +375,14 @@
 				$('#c_room_list').empty();
 			}
 			for(var i=0;i<rArray.length;++i){
-				$('#c_room_list').append('<tr><td><a href="#" id="c_rm_'+rArray[i].name+'" value="'+rArray[i].name+'">'+rArray[i].name+'</a></td><td>'+rArray[i].players.length+'/'+rArray[i].capacity+'</td><td><a id="c_bt_'+rArray[i].name+'"><button type="button" class="btn btn-success fill-width" aria-label="Left Align">Join<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></button></a></td></tr>');
+				var tnum;
+				if(rArray[i].players==0){
+					tnum=0;
+				}
+				else{
+					tnum=rArray[i].players.length;
+				}
+				$('#c_room_list').append('<tr><td><a href="#" id="c_rm_'+rArray[i].name+'" value="'+rArray[i].name+'">'+rArray[i].name+'</a></td><td>'+tnum+'/'+rArray[i].capacity+'</td><td><a id="c_bt_'+rArray[i].name+'"><button type="button" class="btn btn-success fill-width" aria-label="Left Align">Join<span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span></button></a></td></tr>');
 				//console.log(rArray[i]);
 				$('#c_rm_'+rArray[i].name).addClass("c_public_room_choice");
 				$('#c_bt_'+rArray[i].name).addClass("c_public_room_choice");
@@ -388,6 +429,18 @@
 			refreshRoomList(rArray);
 		});
 
+		socket.on('room already exists',function(){
+			$('#b_feedback').html('A room already exists with that name. Please select another name.');
+		});
+
+		socket.on('room doesnt exist', function(){
+			$('#c_feedback').html('Room doesn\'t exist');
+		});
+
+		socket.on('room at capacity',function(){
+			$('#c_feedback').html('Room is at capacity');
+		});
+
 		socket.on('room created',function(roomInfo){
 			console.log("Viewing room: "+roomInfo.name);
 			//$('#c_turnModal').modal('hide');
@@ -397,7 +450,12 @@
 			createPieChart(ia,lab);
 			$('#d_room_name').html(roomInfo.name);
 			roomName=roomInfo.name;
-			refreshPlayerList([]);
+			if(roomInfo.players==null||roomInfo.players.length==0){
+				refreshPlayerList([]);
+			}
+			else{
+				refreshPlayerList(roomInfo.players);
+			}
 		});
 
 		socket.on('first login success',function(roomInfo){

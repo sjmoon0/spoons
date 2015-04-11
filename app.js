@@ -71,11 +71,12 @@ app.use(function(req, res, next) {
 	var rooms=[];
 	var ta=[];
 
-	function createPlayer(playerName){
+	function createPlayer(playerName,pid){
 		var tempplayer={
 			name:playerName,
 			readyToPlay:false,
-			currentHand: ['AS','KH','QC','JD']
+			currentHand: ['AS','KH','QC','JD'],
+			socketid:pid
 		}
 		console.log("New player created: "+playerName);
 		return tempplayer;
@@ -115,10 +116,10 @@ app.use(function(req, res, next) {
 			accessibility:roomInfo.accessibility,//true means public. false means private
 			difficulty:roomInfo.difficulty,//implement later, perhaps
 			players:0,
-			viewers:1,
+			viewers:[],
 			gameStarted:false
 		}
-		console.log("New room created: "+roomInfo.name+" Access: "+roomInfo.accessibility+" Diff:"+roomInfo.difficulty);
+		console.log("New room created: "+temproom.name+" Access: "+temproom.accessibility+" Diff:"+temproom.difficulty);
 		return temproom;
 	}
 
@@ -137,7 +138,19 @@ app.use(function(req, res, next) {
 
 	function canView(name){
 		for(var i=0;i<rooms.length;i++){
+			if(rooms[i].name==name&&rooms[i].players==0){
+				rooms[i].players=[];
+			}
 			if(rooms[i].name==name){
+				return rooms[i];
+			}
+		}
+		return null;
+	}
+
+	function atCapacity(name){
+		for(var i=0;i<rooms.length;i++){
+			if(!(rooms[i].players.length<rooms[i].capacity)){
 				return true;
 			}
 		}
@@ -161,6 +174,51 @@ app.use(function(req, res, next) {
 		console.log(s);
 	}
 
+	function printViewerIDs(room){
+		var s=room.name+" viewers: ";
+		for(var i=0;i<room.viewers.length;++i){
+			s+="| "+room.viewers[i]+" |";
+		}
+		console.log(s);
+	}
+
+	function getRoomFromViewerID(vid){
+		for(var i=0;i<rooms.length;++i){
+			for(var j=0;j<rooms[i].viewers.length;++j){
+				if(rooms[i].viewers[j]==vid){
+					return rooms[i];
+				}
+			}
+		}
+		return null;
+	}
+
+	function removeViewer(rm,vid){
+		for(var i=0;i<rm.viewers.length;++i){
+			if(rm.viewers[i]==vid){
+				rm.viewers.splice(i,1);
+			}
+		}
+	}
+
+	function removeRoom(rm){
+		for(var i=0;i<rooms.length;++i){
+			if(rooms[i].name==rm.name){
+				rooms.splice(i,1);
+			}
+		}
+	}
+
+	function onlyPublicRooms(){
+		var pr=[];
+		for(var i=0;i<rooms.length;++i){
+			if(rooms[i].accessibility=='true'){
+				pr.push(rooms[i]);
+			}
+		}
+		return pr;
+	}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~Networking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 io.on('connection',function(socket){
@@ -171,46 +229,68 @@ io.on('connection',function(socket){
 	io.to('lobby').emit('test1',"lobby");
 	
 	socket.on('create room',function(roomInfo){
-		socket.leave('lobby');
-		rooms.push(createRoom(roomInfo));
-		socket.join(roomInfo.name);
-		printRooms();
-		io.to(roomInfo.name).emit('room created',roomInfo);
+		var temproom=getRoomObject(roomInfo.name);
+		if(temproom!=null){
+			socket.emit('room already exists');
+		}
+		else{
+			socket.leave('lobby');
+			var temproom=createRoom(roomInfo);
+			temproom.viewers.push(socket.id);
+			rooms.push(temproom);
+			socket.join(roomInfo.name);
+			printRooms();
+			//io.to(roomInfo.name).emit('room created',roomInfo);
+			socket.emit('room created',roomInfo);
+			io.to('lobby').emit('refresh room list',onlyPublicRooms());
+		}
 	});
 	
 	socket.on('get room list',function(){
-		io.to('lobby').emit('refresh room list',rooms);
+		io.to('lobby').emit('refresh room list',onlyPublicRooms());
 	});
 
 	socket.on('view room',function(roomInfo){
-		if(!canView(roomInfo)){
+		if(canView(roomInfo)==null){
 			//fire event that makes user rechoose room
-			console.log("Room either either not created or at capacity");
+			console.log("Room does not exist");
+			socket.emit('room doesnt exist');
 			return;
 		}
 		socket.leave('lobby');
 		socket.join(roomInfo);
 		var temproom=getRoomObject(roomInfo);
-		temproom.viewers++;
-		console.log("There are "+temproom.viewers+" viewers viewing the "+roomInfo+" room!");
+		temproom.viewers.push(socket.id);
+		console.log("There are "+temproom.viewers.length+" viewers viewing the "+roomInfo+" room!");
+		printViewerIDs(temproom);
 		io.to(roomInfo).emit('room created',temproom);
 	});
 
 	socket.on('player login',function(info){
-		if(!isValidRoom(info.rname)){
-			//fire event that makes user rechoose room
-			console.log("Room either either not created or at capacity");
+		if(canView(info.rname)==null){
+			socket.emit('room doesnt exist');
+			return;
+		}
+		/*
+		if(atCapacity(info.rname)){
+			socket.emit('room at capacity');
+			return;
+		}
+		*/
+		if(getRoomObject(info.rname).gameStarted){
+			socket.emit('game already started');
 			return;
 		}
 		if(isNameUsed(info.name,info.rname)){
 			//fire event that makes user rechoose name
 			console.log("Username already in use");
+			socket.emit('username in use');
 			return;
 		}
 		socket.emit('register user',info);
-		//fire event that sends full username list to clients of given room
-		var temproom=addPlayerToRoom(createPlayer(info.name),info.rname);
+		var temproom=addPlayerToRoom(createPlayer(info.name,socket.id),info.rname);
 		console.log(temproom.players.length+" players in "+info.rname);
+		io.to('lobby').emit('refresh room list',onlyPublicRooms());
 		socket.leave('lobby');
 		socket.join(info.rname);
 		if(temproom.players.length>1){
@@ -237,6 +317,7 @@ io.on('connection',function(socket){
 				}
 			}
 			if(totalReady>=temproom.players.length){
+				temproom.gameStarted=true;
 				io.to(info.rm).emit('all players ready',temproom);
 			}
 		}
@@ -245,9 +326,22 @@ io.on('connection',function(socket){
 		}
 	});
 
-	//socket.on('disconnect',function(roomInfo){
-	
-	//}
+	socket.on('disconnect',function(){
+		console.log(socket.id+" disconnected");
+		var affectedRoom=getRoomFromViewerID(socket.id);
+		//console.log(io);
+		//var affectedRoom=getRoomObject(io.sockets.connected[socket.id]);
+		//console.log(socket.id+" disconnected from "+affectedRoom.name);
+		if(affectedRoom!=null){
+			removeViewer(affectedRoom,socket.id);
+			if(affectedRoom.viewers.length<=0){
+				console.log('disconnect everyone in '+affectedRoom.name+'!');
+				io.to(affectedRoom.name).emit('all viewers gone');
+				removeRoom(affectedRoom);
+				io.to('lobby').emit('refresh room list',onlyPublicRooms());
+			}
+		}
+	});
 });
 
 console.log("Server Started");

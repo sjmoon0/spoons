@@ -6,6 +6,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	</head>
 	<body>
+		<div class="container state m0">	
+			<div class="row col-centered">
+				<h1 class="center-text">Spoons</h1>
+				<h4 class="center-text">Your game session has been disconnected. Please refresh the page and join another game session.</h4>
+			</div>
+			<div>
+				<a href="http://131.118.95.193:3000"><button id="m0_refresh_page" type="button" class="btn btn-primary fill-width make-tall-fifty" aria-label="Left Align">
+					Refresh
+				  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+				</button></a>
+			</div>
+		</div>
+
 		<div class="container state m1">	
 			<div class="row col-centered">
 				<h1 class="center-text">Spoons</h1>
@@ -34,6 +47,9 @@
 				</button>
 				
 				<div class="col-xs-12 col-md-3"></div>
+			</div>
+			<div class='row col-centered'>
+				<p id="m1_feedback" style='color:red'></p>
 			</div>
 			<p></p>
 			<div class="row col-centered">
@@ -114,6 +130,18 @@
 		var userName='';
 		var tog=true;
 
+		function validate1(){
+			if($('#m1_room_name').val()==''||$('#m1_room_name').val()==null){
+				$('#m1_feedback').html('Please provide a room name');
+				return false;
+			}
+			if($('#m1_user_name').val()==''||$('#m1_user_name').val()==null){
+				$('#m1_feedback').html('Please provide a user name');
+				return false;
+			}
+			return true;
+		}
+
 		function createPieChart(ia,lab) {
 			var temp=[];
 			var sum=0;
@@ -177,7 +205,9 @@
 			});
 
 			$("#m1_join_room").click(function(){
-				socket.emit('player login',{name:$('#m1_user_name').val(),rname:$('#m1_room_name').val()});
+				if(validate1()){
+					socket.emit('player login',{name:$('#m1_user_name').val(),rname:$('#m1_room_name').val()});
+				}
 			});
 
 			$("#m3_play_game").click(function(){
@@ -195,6 +225,22 @@
 		socket.on('test1', function (data) {
 			console.log("Aw yeah in room:"+data);
 			//socket.emit('my other event', { my: 'data' });
+		});
+
+		socket.on('room doesnt exist',function(){
+			$('#m1_feedback').html('Room doesn\'t exist');
+		});
+
+		socket.on('room at capacity',function(){
+			$('#m1_feedback').html('Room is at capacity');
+		});
+
+		socket.on('game already started',function(){
+			$('#m1_feedback').html('The game has already started in this room!');
+		});
+
+		socket.on('username in use',function(){
+			$('#m1_feedback').html('Username already in use. Please choose another.');
 		});
 
 		socket.on('first login success',function(roomInfo){
@@ -244,6 +290,11 @@
 
 		socket.on('all players ready',function(roomInfo){
 			goToState(4);
+		});
+
+		socket.on('all viewers gone', function(){
+			goToState(0);
+			socket.emit('disconnect');
 		});
 
 		</script>
