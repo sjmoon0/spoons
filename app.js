@@ -71,12 +71,20 @@ app.use(function(req, res, next) {
 	var rooms=[];
 	var ta=[];
 
+	var deck=['AH','2H','3H','4H','5H','6H','7H','8H','9H','1H','JH','QH','KH',
+			  'AC','2C','3C','4C','5C','6C','7C','8C','9C','1C','JC','QC','KC',
+			  'AD','2D','3D','4D','5D','6D','7D','8D','9D','1D','JD','QD','KD',
+			  'AS','2S','3S','4S','5S','6S','7S','8S','9S','1S','JS','QS','KS'];
+
 	function createPlayer(playerName,pid){
 		var tempplayer={
 			name:playerName,
 			readyToPlay:false,
-			currentHand: ['AS','KH','QC','JD'],
-			socketid:pid
+			hand: ['AS','KH','QC','JD'],
+			socketid:pid,
+			//sock:sh.s,
+			cardPile:[],
+			currCard:''
 		}
 		console.log("New player created: "+playerName);
 		return tempplayer;
@@ -117,7 +125,9 @@ app.use(function(req, res, next) {
 			difficulty:roomInfo.difficulty,//implement later, perhaps
 			players:0,
 			viewers:[],
-			gameStarted:false
+			gameStarted:false,
+			remDeck:[],
+			discardPile:[]//The last player discards hid cards into this. Then when remDeck is empty, it gets set to shuffle(discardPile)
 		}
 		console.log("New room created: "+temproom.name+" Access: "+temproom.accessibility+" Diff:"+temproom.difficulty);
 		return temproom;
@@ -219,11 +229,54 @@ app.use(function(req, res, next) {
 		return pr;
 	}
 
+	function shuffle(cdeck0){
+		var cdeck=cdeck0.slice();
+		var currIndex=cdeck.length,temp,rand;
+		while(0!==currIndex){
+			rand=Math.floor(Math.random()*currIndex);
+			currIndex-=1;
+			temp=cdeck[currIndex];
+			cdeck[currIndex]=cdeck[rand];
+			cdeck[rand]=temp;
+		}
+		return cdeck;
+	}
+
+	function deal(rm,cdeck){
+		//var rm=getRoomObject(roomName);
+		for(var i=0; i<rm.players[0].hand.length;++i){
+			for(var j=0;j<rm.players.length;++j){
+				rm.players[j].hand[i]=cdeck.pop();
+			}
+		}
+		return cdeck;//return remaining cards in deck
+	}
+
+/* Doesn't work for some reason
+	function getPlayerFromID(rm,sid){
+		for(var i=0;i<rm.players.length;++i){
+			if(sid==rm.players[i].pid){
+				return rm.players[i];
+			}
+		}
+		return null;
+	};
+*/
+	function getPlayerFromUN(rm,un){
+		for(var i=0;i<rm.players.length;++i){
+			if(un==rm.players[i].name){
+				return rm.players[i];
+			}
+		}
+		return null;
+	}
+
+	function getPlayerOnLeft(){};
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~Networking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 io.on('connection',function(socket){
 	console.log("holla:"+app.path());
-
 	socket.join('lobby');
 	console.log(socket.id+" in lobby");
 	io.to('lobby').emit('test1',"lobby");
@@ -316,15 +369,117 @@ io.on('connection',function(socket){
 					totalReady++;
 				}
 			}
-			if(totalReady>=temproom.players.length){
+			if(totalReady>=temproom.players.length){//THIS IS WHERE THE GAME ACTION STARTS!
 				temproom.gameStarted=true;
+				temproom.remDeck=deal(temproom,shuffle(deck));
 				io.to(info.rm).emit('all players ready',temproom);
+				//emit update cardpile to player one. Or do something to just make the cardpile active
 			}
 		}
 		else{
 			console.log("error when user "+info.un+" clicked ready button.");
 		}
 	});
+
+	socket.on('pass left',function(stuff){
+		//called when player swiped middle section left
+		//pass in the card that was passed left, username, and room name
+		//get room object from roomName
+		var rm=getRoomObject(stuff.rm);
+		//get player from username
+		var player=getPlayerFromUN(rm,stuff.un);
+		console.log(stuff.un+" passed "+stuff.card+" left");
+		if(stuff.card==''){//if (the passed card is null). We don't need to send anything to 
+			if(rm.players.indexOf(player)==0){//if(player == first player)
+				if(rm.remDeck.length==0){
+					rm.remDeck=shuffle(rm.discardPile);
+				}
+				socket.emit('display pile');
+				player.currentCard=rm.remDeck.shift();
+				socket.emit('set current card',player.currentCard);
+				//player.cardPile.push(rm.remDeck.shift());
+			}
+			else if(player.cardPile.length>0){
+				player.currentCard=player.cardPile.shift();
+				socket.emit('set current card',player.currentCard);
+			}
+		}
+		else{
+			if(rm.players.indexOf(player)==0){
+				if(rm.remDeck.length==0){
+					rm.remDeck=shuffle(rm.discardPile);
+				}
+				rm.players[1].cardPile.push(player.currentCard);
+				//rm.players[1].sock.emit('update pile',rm.players[1].cardPile);
+				//io.sockets.connected[rm.players[1].socketid].emit('update pile',rm.players[1].cardPile);
+				io.sockets.connected[rm.players[1].socketid].emit('display pile');
+				player.currentCard=rm.remDeck.shift();
+				socket.emit('set current card',player.currentCard);
+				//player.cardPile.push(rm.remDeck.shift());
+				socket.emit('display pile');
+			}
+			else{
+				if(player.cardPile.length>0){
+					if(rm.players.indexOf(player)==(rm.players.length-1)){
+						rm.discardPile.push(player.currentCard);
+						console.log("Discarded: "+player.currentCard);
+						player.currentCard=player.cardPile.shift();
+						socket.emit('set current card',player.currentCard);
+					}
+					else{
+						rm.players[rm.players.indexOf(player)+1].cardPile.push(player.currentCard);
+						//rm.players[rm.players.indexOf(player)+1].sock.emit('update pile',rm.players[rm.players.indexOf(player)+1].cardPile);
+						io.sockets.connected[rm.players[rm.players.indexOf(player)+1].socketid].emit('display pile');
+						player.currentCard=player.cardPile.shift();
+						socket.emit('set current card',player.currentCard);
+					}
+					if(player.cardPile.length>0){
+						socket.emit('display pile');
+					}
+				}
+			}
+		}
+	});
+
+	socket.on('discard left',function(){
+		//called when player swipes up on a card in his hand
+		//pass in the card that was discarded, the currentCard, and room name
+		//get player from socket.id
+		//get room object from roomName
+		//if(currentCard!=null)
+			//if(socket.id == last player)
+				//append discarded card to discardedPile
+				//set player.hand[indexOf(card)]=currentCard
+			//else
+				//append discarded card to player on left's cardPile
+				//send that cardPile to player on left
+				//set player.hand[indexOf(card)]=currentCard
+
+				//if (players cardPile !=empty)
+					//if(socket.id == first player)
+						//if(remDeck is empty)
+							//remDeck=shuffle(discardPile)
+						//set currentCard = cardPile.pop
+						//send remDeck.pop as the only element in first players cardPile
+					//set currentCard = cardPile.pop
+				//else
+					//set currentCard=null
+			//send new player.hand to this player
+
+	});
+	socket.on('get hand',function(rm){
+		var cRoom=getRoomObject(rm.rm);
+		var cPlayer=getPlayerFromUN(cRoom,rm.un);
+		socket.emit('update hand',cPlayer.hand);
+	});
+	/*
+	socket.on('',function(){
+		
+	});
+	socket.on('',function(){
+		
+	});
+	*/
 
 	socket.on('disconnect',function(){
 		console.log(socket.id+" disconnected");
@@ -341,6 +496,10 @@ io.on('connection',function(socket){
 				io.to('lobby').emit('refresh room list',onlyPublicRooms());
 			}
 		}
+	});
+
+	socket.on('error', function(err){
+		console.error(err.stack);
 	});
 });
 

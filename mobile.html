@@ -111,19 +111,27 @@
 
 		<div class="state m4">
 			<div class="m4top">
-				<div class="m4tq"></div>
-				<div class="m4tq"></div>
-				<div class="m4tq"></div>
-				<div class="m4tq"></div>
+				<div class="m4tq"><div id="card1" class="cardslot"></div></div>
+				<div class="m4tq"><div id="card2" class="cardslot"></div></div>
+				<div class="m4tq"><div id="card3" class="cardslot"></div></div>
+				<div class="m4tq"><div id="card4" class="cardslot"></div></div>
 			</div>
-			<div class="m4mid"></div>
-			<div class="m4bot"></div>
+			<div id="center" class="m4mid"><!-- comments to fix inline block
+			--><div class="m4midL"></div><!-- comments to fix inline block
+			--><div class="m4midM"><div id="m4_cardholder" data-card=''></div></div><!-- comments to fix inline block
+			--><div class="m4midR"></div><!-- comments to fix inline block
+			--><div class="m4midRR"><div id="m4_cardpile"></div></div><!-- comments to fix inline block
+		--></div>
+			<div class="m4bot">
+				<button type="button" id="m4_grabbutton" class="btn btn-success"><b>Grab Spoon!</b></button>
+			</div>
 		</div><!-- End State m4 -->
 		
 		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<script src="socket.io/socket.io.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 		<script src="http://131.118.95.193/thesis/piechart.js"></script>
+		<script src="https://hammerjs.github.io/dist/hammer.js"></script>
 		<script>
 		var socket = io('http://131.118.95.193:3000');
 		var currRoom='';
@@ -165,16 +173,8 @@
 					data: temp,
 					labels: lab,
 					colors: [
-		            	["#D50000", "#D50000"],//red
+		            	["#D50000", "#D50000"],
 		            	["#6CFF01", "#6CFF01"]
-		            	//["#03BD03", "#03BD03"],
-		            	//["#00E5AD", "#00E5AD"],
-		            	//["#0200C3", "#0200C3"],
-		            	//["#5F2CBC", "#5F2CBC"],
-		            	//["#A619AC", "#A619AC"],
-		            	//["#E60491", "#E60491"],
-		            	//["#FF9108", "#FF9108"],
-		            	//["#FFEE00", "#FFEE00"]
 					]
 				}
 			);
@@ -184,10 +184,21 @@
 
 
 		<script>
+		var c1e = document.getElementById('card1');
+		var card1 = new Hammer(c1e);
+		var c2e = document.getElementById('card2');
+		var card2 = new Hammer(c2e);
+		var c3e = document.getElementById('card3');
+		var card3 = new Hammer(c3e);
+		var c4e = document.getElementById('card4');
+		var card4 = new Hammer(c4e);
+		var ce = document.getElementById('center');
+		var center = new Hammer(ce);
 
 		$(document).ready(function(){
 			goToState(1);
 			$("#m1_use_as_desktop").hide();
+			$('#m4_cardpile').hide();
 
 			$(document).bind('touchmove', function(e) {
 				e.preventDefault();
@@ -213,11 +224,46 @@
 			$("#m3_play_game").click(function(){
 				socket.emit('player clicked ready',{un:userName,rm:currRoom});
 			});
+
+			/*
+			center.on("panleft panright panup pandown tap press",function(ev){
+				ce.textContent = ev.type +" gesture detected.";
+			});
+			*/
+			center.on("swipeleft",function(){
+				var temp={
+					rm:currRoom,
+					un:userName,
+					card:$('#m4_cardholder').data('card')
+				}
+				socket.emit('pass left', temp);
+				$('#m4_cardpile').hide();
+			});
+
+			card1.on("panup panleft panright",function(ev){
+				c1e.textContent = ev.type +" gesture detected.";
+			});
+			card2.on("panup panleft panright",function(ev){
+				c2e.textContent = ev.type +" gesture detected.";
+			});
+			card3.on("panup panleft panright",function(ev){
+				c3e.textContent = ev.type +" gesture detected.";
+			});
+			card4.on("panup panleft panright",function(ev){
+				c4e.textContent = ev.type +" gesture detected.";
+			});
 		});
 
 		function goToState(st){
 			$('.state').hide();
 			$('.m'+st).show();
+			if(st==4){
+				card1.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+				card2.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+				card3.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+				card4.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+				center.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+			}
 		}
 
 		//~~~~~~~~~~~~~~~~~~~~Event Driven Networking~~~~~~~~~~~~~~~~
@@ -290,6 +336,11 @@
 
 		socket.on('all players ready',function(roomInfo){
 			goToState(4);
+			var temp={
+				un:userName,
+				rm:currRoom
+			}
+			socket.emit('get hand',temp);
 		});
 
 		socket.on('all viewers gone', function(){
@@ -297,9 +348,23 @@
 			socket.emit('disconnect');
 		});
 
+		socket.on('update hand', function(hand){
+			$('#card1').html("<h2>"+hand[0]+"</h2>");
+			$('#card2').html("<h2>"+hand[1]+"</h2>");
+			$('#card3').html("<h2>"+hand[2]+"</h2>");
+			$('#card4').html("<h2>"+hand[3]+"</h2>");
+		});
+
+		socket.on('display pile',function(){
+			$('#m4_cardpile').show();
+		});
+
+		socket.on('set current card',function(card){
+			$('#m4_cardholder').html("<h1>"+card+"</h1>");
+			$('#m4_cardholder').data("card",card);
+		});
+
 		</script>
 
 	</body>
-
-
 </html>
