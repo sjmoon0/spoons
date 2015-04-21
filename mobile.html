@@ -76,7 +76,28 @@
 				  <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
 				</button>
 			</div>
-		</div><!-- End State m2 -->
+		</div>
+			<div class="modal fade" id="m2_instructionsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <!--<div class="modal-header">
+			        <h4 class="modal-title" id="m2_myModalLabel">How to play</h4>
+			      </div>-->
+			      <div id="m2_modalBody"class="modal-body">
+			      	<p>Objective of game: <b>Get a spoon</b></p>
+			      	<p>A spoon can be grabbed when you have 4 of a kind in your hand(top four cards on your game screen), or when another player grabs a spoon.</p>
+			      	<p>When the right side of the screen is highlighted in pink, you are able to draw a card. To draw this card, swipe the card left.</p>
+			      	<p>If you want to keep the card you drew, swipe up on a card in your hand to replace it with the current card.</p>
+			      	<p>Once you collect 4 of a kind or another player grabs a spoon, you can grab a spoon!</p>
+			      </div>
+			      <div id="m2_modalFooter"class="modal-footer">
+			      	<button id='m2_ok'type='button' class='btn btn-success customButton' data-dismiss="modal">I Got it!</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+
+		<!-- End State m2 -->
 
 		<div class="container state m3">
 			<p></p>
@@ -100,7 +121,7 @@
 			<div class="row col-centered">
 				<div class="col-xs-12 col-md-3"></div>
 				<div class="col-xs-12 col-md-6">
-					<button id="m2_instructions" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
+					<button id="m3_instructions" type="button" class="btn btn-default fill-width make-tall-fifty" aria-label="Left Align">
 							View Instructions
 					  <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
 					</button>
@@ -131,14 +152,14 @@
 
 		<div class="state m4">
 			<div class="m4top">
-				<div class="m4tq"><div id="card1" class="cardslot"></div></div>
-				<div class="m4tq"><div id="card2" class="cardslot"></div></div>
-				<div class="m4tq"><div id="card3" class="cardslot"></div></div>
-				<div class="m4tq"><div id="card4" class="cardslot"></div></div>
+				<div class="m4tq"><div id="card1" class="cardslot"><div class="incardslot"><p></p><p></p></div></div></div>
+				<div class="m4tq"><div id="card2" class="cardslot"><div class="incardslot"><p></p><p></p></div></div></div>
+				<div class="m4tq"><div id="card3" class="cardslot"><div class="incardslot"><p></p><p></p></div></div></div>
+				<div class="m4tq"><div id="card4" class="cardslot"><div class="incardslot"><p></p><p></p></div></div></div>
 			</div>
 			<div id="center" class="m4mid"><!-- comments to fix inline block
 			--><div class="m4midL"></div><!-- comments to fix inline block
-			--><div class="m4midM"><div id="m4_cardholder" data-card=''></div></div><!-- comments to fix inline block
+			--><div class="m4midM"><div id="m4_cardholder" data-card=''><div class="incardholder"><p></p><p></p></div></div></div><!-- comments to fix inline block
 			--><div class="m4midR"></div><!-- comments to fix inline block
 			--><div class="m4midRR"><div id="m4_cardpile"></div></div><!-- comments to fix inline block
 			--></div>
@@ -256,6 +277,13 @@
 				if(validate1()){
 					socket.emit('player login',{name:$('#m1_user_name').val(),rname:$('#m1_room_name').val()});
 				}
+			});
+
+			$("#m2_instructions").click(function(){
+				$("#m2_instructionsModal").modal('show');
+			});
+			$("#m3_instructions").click(function(){
+				$("#m2_instructionsModal").modal('show');
 			});
 
 			$("#m3_play_game").click(function(){
@@ -411,6 +439,7 @@
 
 		socket.on('all players ready',function(roomInfo){
 			goToState(4);
+			$("#m2_instructionsModal").modal('hide');
 			var temp={
 				un:userName,
 				rm:currRoom
@@ -424,10 +453,43 @@
 		});
 
 		socket.on('update hand', function(hand){
-			$('#card1').html("<b>"+hand[0]+"</b>");
-			$('#card2').html("<b>"+hand[1]+"</b>");
-			$('#card3').html("<b>"+hand[2]+"</b>");
-			$('#card4').html("<b>"+hand[3]+"</b>");
+			var c1c,c1s,c1v;
+			switch(hand[0].charAt(1)){
+				case 'H': c1c='red';c1s='&hearts;';break;
+				case 'D': c1c='red';c1s='&diams;';break;
+				case 'C': c1c='black';c1s='&clubs;';break;
+				case 'S': c1c='black';c1s='&spades;';break;
+			}
+			c1v=((hand[0].charAt(0)=='1')?'10':hand[0].charAt(0));
+			var c2c,c2s,c2v;
+			switch(hand[1].charAt(1)){
+				case 'H': c2c='red';c2s='&hearts;';break;
+				case 'D': c2c='red';c2s='&diams;';break;
+				case 'C': c2c='black';c2s='&clubs;';break;
+				case 'S': c2c='black';c2s='&spades;';break;
+			}
+			c2v=((hand[1].charAt(0)=='1')?'10':hand[1].charAt(0));
+			var c3c,c3s,c3v;
+			switch(hand[2].charAt(1)){
+				case 'H': c3c='red';c3s='&hearts;';break;
+				case 'D': c3c='red';c3s='&diams;';break;
+				case 'C': c3c='black';c3s='&clubs;';break;
+				case 'S': c3c='black';c3s='&spades;';break;
+			}
+			c3v=((hand[2].charAt(0)=='1')?'10':hand[2].charAt(0));
+			var c4c,c4s,c4v;
+			switch(hand[3].charAt(1)){
+				case 'H': c4c='red';c4s='&hearts;';break;
+				case 'D': c4c='red';c4s='&diams;';break;
+				case 'C': c4c='black';c4s='&clubs;';break;
+				case 'S': c4c='black';c4s='&spades;';break;
+			}
+			c4v=((hand[3].charAt(0)=='1')?'10':hand[3].charAt(0));
+
+			$('#card1').html("<div class='incardslot' style='color:"+c1c+";'><p>"+c1v+"</p><p>"+c1s+"<p/></div>");
+			$('#card2').html("<div class='incardslot' style='color:"+c2c+";'><p>"+c2v+"</p><p>"+c2s+"<p/></div>");
+			$('#card3').html("<div class='incardslot' style='color:"+c3c+";'><p>"+c3v+"</p><p>"+c3s+"<p/></div>");
+			$('#card4').html("<div class='incardslot' style='color:"+c4c+";'><p>"+c4v+"</p><p>"+c4s+"<p/></div>");
 		});
 
 		socket.on('display pile',function(){
@@ -435,8 +497,23 @@
 		});
 
 		socket.on('set current card',function(card){
-			$('#m4_cardholder').html("<h1>"+card+"</h1>");
-			$('#m4_cardholder').data("card",card);
+			var cc,cs,cv;
+			if(card==''){
+				$('#m4_cardholder').css('background-color','#b0c4de');
+				$('#m4_cardholder').html("<div class='incardholder'><p></p><p><p/></div>");
+			}
+			else{
+				$('#m4_cardholder').css('background-color','#FFFFFF');
+				switch(card.charAt(1)){
+					case 'H': cc='red';cs='&hearts;';break;
+					case 'D': cc='red';cs='&diams;';break;
+					case 'C': cc='black';cs='&clubs;';break;
+					case 'S': cc='black';cs='&spades;';break;
+				}
+				cv=((card.charAt(0)=='1')?'10':card.charAt(0));
+				$('#m4_cardholder').html("<div class='incardholder' style='color:"+cc+";'><p>"+cv+"</p><p>"+cs+"<p/></div>");
+				$('#m4_cardholder').data("card",card);
+			}
 		});
 
 		socket.on('display spoon',function(){
