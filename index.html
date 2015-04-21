@@ -46,7 +46,17 @@
 			</div>
 			<p></p>
 			<div class="row col-centered">
-				<iframe width="560" height="315" src="https://www.youtube.com/embed/fY8EKIrKjMk" frameborder="0" allowfullscreen class="other-centered"></iframe>		
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/fY8EKIrKjMk" frameborder="0" allowfullscreen class="other-centered"></iframe>
+			</div>
+			<div class="row col-centered">
+				<div class="col-xs-12 col-md-4"></div>
+				<div class="col-xs-12 col-md-4">
+					<a id="a_adv_settings" href="#">Advanced Settings...</a>
+					<button id="a_use_as_mobile" type="button"  class="btn btn-warning fill-width make-tall-fifty" aria-label="Left Align">
+						Use as Mobile <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
+					</button>
+				</div>
+				<div class="col-xs-12 col-md-4"></div>
 			</div>
 		</div> <!-- End State A -->
 
@@ -242,7 +252,36 @@
 			    </div>
 			  </div>
 			</div>	
-		</div>
+		</div><!-- End state D-->
+
+		<div class="state e"><!--
+			--><div id="etop"></div><!--
+			--><div id="emid"><!--
+				--><div id="emidl"></div><!--
+				--><div id="emidm" class="centerme">
+					</div><!--
+				--><div id="emidr"></div><!--
+			--></div><!--
+			--><div id="ebot"></div>
+
+
+			<div class="modal fade" id="e_notify" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <!--<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>-->
+			        <h4 class="modal-title" id="e_myModalLabel">Game Over!</h4>
+			      </div>
+			      <div id="e_modalBody"class="modal-body">
+			      	<p><a id="e_loserName">User Joe</b> failed to grab a spoon!</b>
+			      </div>
+			      <div id="e_modalFooter"class="modal-footer">
+			        </div>
+			    </div>
+			  </div>
+			</div>	
+
+		</div><!-- End state E-->
 
 		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<script src="socket.io/socket.io.js"></script>
@@ -276,14 +315,6 @@
 					colors: [
 		            	["#D50000", "#D50000"],//red
 		            	["#6CFF01", "#6CFF01"]
-		            	//["#03BD03", "#03BD03"],
-		            	//["#00E5AD", "#00E5AD"],
-		            	//["#0200C3", "#0200C3"],
-		            	//["#5F2CBC", "#5F2CBC"],
-		            	//["#A619AC", "#A619AC"],
-		            	//["#E60491", "#E60491"],
-		            	//["#FF9108", "#FF9108"],
-		            	//["#FFEE00", "#FFEE00"]
 					]
 				}
 			);
@@ -295,16 +326,34 @@
 		var socket = io.connect('http://131.118.95.193:3000');
 		var listRefreshTimer;
 		var roomName='';
+		var tog=true;
 		//~~~~~~~~~~~~~~~~~~~~~~jQuery~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		$(document).ready(function(){
 			//refreshRoomListLoop()
 			goToState('a');
+			$("#a_use_as_mobile").hide();
+			$("#e_notify").modal('hide');
+
 			$('#a_view_rooms').click(function(){
 				goToState('c');
 				socket.emit('get room list');
 			});
 			$('#a_create_room').click(function(){
 				goToState('b');
+			});
+			$("#a_adv_settings").click(function(){
+				tog=!tog;
+				if(tog){
+					$("#a_use_as_mobile").hide();
+					$("#a_adv_settings").html("Advanced Settings...");
+				}
+				else{
+				$("#a_use_as_mobile").show();
+					$("#a_adv_settings").html("Hide Settings...");
+				}
+			});
+			$("#a_use_as_mobile").click(function(){
+				window.location.replace("http://131.118.95.193:3000/mobile");
 			});
 			$('#c_create_room').click(function(){
 				goToState('b');
@@ -410,6 +459,21 @@
 				$('#d_player_list').append("<thead><tr><th>"+pArray[i].name+"</th><th>"+status+"</th></tr></thead>");
 			}
 		}
+
+		function drawSpoons(num){
+			$("#emidm").html('');
+			if(num<0){
+				return;
+			}
+			for(var i=0;i<num;++i){
+				if(i%2==0){
+					$("#emidm").append('<img class="spoon" src="http://131.118.95.193/thesis/spoon.png">');
+				}
+				else if(i%2==1){
+					$("#emidm").append('<img class="spoon" src="http://131.118.95.193/thesis/spoon1.png">');
+				}
+			}
+		}
 		/*
 		function refreshRoomListLoop(){
 			socket.emit('get room list');
@@ -491,6 +555,16 @@
 
 		socket.on('all players ready',function(roomInfo){
 			goToState('e');
+		});
+
+		socket.on('update spoons', function(num){
+			console.log(num+" spoons remaining");
+			drawSpoons(num);
+		});
+
+		socket.on('game over', function(un){
+			$('#e_notify').modal('show');
+			$('#e_loserName').html(un);
 		});
 		
 		</script>

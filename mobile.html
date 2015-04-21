@@ -26,7 +26,7 @@
 				<h5 class="center-text">Frostburg State University</h5>
 			</div>
 			<div class="row col-centered">
-				<div class="col-xs-12 col-md-3"></div>
+				<!--<div class="col-xs-12 col-md-3"></div>-->
 				
 				<div class="form-group has-success has-feedback">
 			        <label class="control-label" for="inputSuccess4">Room to join:</label>
@@ -126,6 +126,14 @@
 				<button type="button" id="m4_grabbutton" class="btn btn-success"><b>Grab Spoon!</b></button>
 			</div>
 		</div><!-- End State m4 -->
+
+		<div class="state m5">
+			<div class="m4top"></div>
+			<div class="m4mid centerme">
+				<img class="spoon" src="http://131.118.95.193/thesis/spoon.png" height="100%">
+			</div>
+			<div class="m4bot"></div>
+		</div>
 		
 		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<script src="socket.io/socket.io.js"></script>
@@ -148,6 +156,13 @@
 				return false;
 			}
 			return true;
+		}
+
+		function hideGrabButton(){
+			$('#m4_grabbutton').hide();
+			setTimeout(function(){
+				$('#m4_grabbutton').show();
+			},3000);
 		}
 
 		function createPieChart(ia,lab) {
@@ -214,7 +229,9 @@
 					$("#adv_settings").html("Hide Settings...");
 				}
 			});
-
+			$("#m1_use_as_desktop").click(function(){
+				window.location.replace("http://131.118.95.193:3000/desktop");
+			});
 			$("#m1_join_room").click(function(){
 				if(validate1()){
 					socket.emit('player login',{name:$('#m1_user_name').val(),rname:$('#m1_room_name').val()});
@@ -223,6 +240,14 @@
 
 			$("#m3_play_game").click(function(){
 				socket.emit('player clicked ready',{un:userName,rm:currRoom});
+			});
+
+			$("#m4_grabbutton").click(function(){
+				var temp={
+					rm:currRoom,
+					un:userName
+				}
+				socket.emit('grab spoon', temp);
 			});
 
 			/*
@@ -240,17 +265,37 @@
 				$('#m4_cardpile').hide();
 			});
 
-			card1.on("panup panleft panright",function(ev){
-				c1e.textContent = ev.type +" gesture detected.";
+			card1.on("panstart",function(ev){
+				var temp={
+					rm:currRoom,
+					un:userName,
+					slot:0
+				}
+				socket.emit('discard',temp);
 			});
-			card2.on("panup panleft panright",function(ev){
-				c2e.textContent = ev.type +" gesture detected.";
+			card2.on("panstart",function(ev){
+				var temp={
+					rm:currRoom,
+					un:userName,
+					slot:1
+				}
+				socket.emit('discard',temp);
 			});
-			card3.on("panup panleft panright",function(ev){
-				c3e.textContent = ev.type +" gesture detected.";
+			card3.on("panstart",function(ev){
+				var temp={
+					rm:currRoom,
+					un:userName,
+					slot:2
+				}
+				socket.emit('discard',temp);
 			});
-			card4.on("panup panleft panright",function(ev){
-				c4e.textContent = ev.type +" gesture detected.";
+			card4.on("panstart",function(ev){
+				var temp={
+					rm:currRoom,
+					un:userName,
+					slot:3
+				}
+				socket.emit('discard',temp);
 			});
 		});
 
@@ -349,10 +394,10 @@
 		});
 
 		socket.on('update hand', function(hand){
-			$('#card1').html("<h2>"+hand[0]+"</h2>");
-			$('#card2').html("<h2>"+hand[1]+"</h2>");
-			$('#card3').html("<h2>"+hand[2]+"</h2>");
-			$('#card4').html("<h2>"+hand[3]+"</h2>");
+			$('#card1').html("<b>"+hand[0]+"</b>");
+			$('#card2').html("<b>"+hand[1]+"</b>");
+			$('#card3').html("<b>"+hand[2]+"</b>");
+			$('#card4').html("<b>"+hand[3]+"</b>");
 		});
 
 		socket.on('display pile',function(){
@@ -362,6 +407,14 @@
 		socket.on('set current card',function(card){
 			$('#m4_cardholder').html("<h1>"+card+"</h1>");
 			$('#m4_cardholder').data("card",card);
+		});
+
+		socket.on('display spoon',function(){
+			goToState(5);
+		});
+
+		socket.on('invalid grab', function(){
+			hideGrabButton();
 		});
 
 		</script>
