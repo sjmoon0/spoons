@@ -273,7 +273,7 @@
 			        <h4 class="modal-title" id="e_myModalLabel">Game Over!</h4>
 			      </div>
 			      <div id="e_modalBody"class="modal-body">
-			      	<p><a id="e_loserName">User Joe</b> failed to grab a spoon!</b>
+			      	<p><b id="e_loserName">User Joe</b> failed to grab a spoon!</p>
 			      </div>
 			      <div id="e_modalFooter"class="modal-footer">
 			        </div>
@@ -541,6 +541,7 @@
 		});
 
 		socket.on('player ready',function(roomInfo){
+			$('#e_notify').modal('hide');//useful on game restart
 			var readyToPlay=0;
 			for(var i=0;i<roomInfo.players.length;++i){
 				if(roomInfo.players[i].readyToPlay){
@@ -563,6 +564,7 @@
 		});
 
 		socket.on('game over', function(un){
+			goToState('d');
 			$('#e_notify').modal('show');
 			$('#e_loserName').html(un);
 		});

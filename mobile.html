@@ -31,14 +31,14 @@
 				<div class="form-group has-success has-feedback">
 			        <label class="control-label" for="inputSuccess4">Room to join:</label>
 			        <input type="text" class="form-control" id="m1_room_name" aria-describedby="inputSuccess4Status">
-			        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-			        <span id="inputSuccess4Status" class="sr-only">(success)</span>
+			        <!--<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+			        <span id="inputSuccess4Status" class="sr-only">(success)</span>-->
 			    </div>
 				<div class="form-group has-success has-feedback">
 			        <label class="control-label" for="inputSuccess5">User Name:</label>
 			        <input type="text" class="form-control" id="m1_user_name" aria-describedby="inputSuccess5Status">
-			        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
-			        <span id="inputSuccess5Status" class="sr-only">(success)</span>
+			        <!--<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+			        <span id="inputSuccess5Status" class="sr-only">(success)</span>-->
 			    </div>
 
 				<button id="m1_join_room" type="button" class="btn btn-primary fill-width make-tall-fifty" aria-label="Left Align">
@@ -107,6 +107,26 @@
 				</div>
 				<div class="col-xs-12 col-md-3"></div>
 			</div>
+
+			<div class="modal fade" id="m3_prompt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <!--<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>-->
+			        <h4 class="modal-title" id="e_myModalLabel">Game Over!</h4>
+			      </div>
+			      <div id="m3_modalBody"class="modal-body">
+			      	<p><b id="m3_loserName">User Joe</b> failed to grab a spoon!</p>
+			      	<p></p>
+			      	<p>Would You like to play again?</p>
+			      </div>
+			      <div id="m3_modalFooter"class="modal-footer">
+			      	<button id='m3_playAgain'type='button' class='btn btn-success customButton' data-dismiss="modal">Yes!</button>
+			        <button id='m3_quitGame'type="button" class="btn btn-danger customButton">No</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>	
 		</div><!-- End State m3 -->
 
 		<div class="state m4">
@@ -121,7 +141,7 @@
 			--><div class="m4midM"><div id="m4_cardholder" data-card=''></div></div><!-- comments to fix inline block
 			--><div class="m4midR"></div><!-- comments to fix inline block
 			--><div class="m4midRR"><div id="m4_cardpile"></div></div><!-- comments to fix inline block
-		--></div>
+			--></div>
 			<div class="m4bot">
 				<button type="button" id="m4_grabbutton" class="btn btn-success"><b>Grab Spoon!</b></button>
 			</div>
@@ -248,6 +268,16 @@
 					un:userName
 				}
 				socket.emit('grab spoon', temp);
+			});
+
+			$("#m3_quitGame").click(function(){
+				var temp={
+					rm:currRoom,
+					un:userName
+				}
+				socket.emit('custom disconnect',temp);
+				socket.disconnect();
+				goToState(0);
 			});
 
 			/*
@@ -390,7 +420,7 @@
 
 		socket.on('all viewers gone', function(){
 			goToState(0);
-			socket.emit('disconnect');
+			socket.disconnect();
 		});
 
 		socket.on('update hand', function(hand){
@@ -415,6 +445,12 @@
 
 		socket.on('invalid grab', function(){
 			hideGrabButton();
+		});
+
+		socket.on('game over',function(un){
+			$("#m3_play_game").show();
+			$("#m3_prompt").modal('show');
+			$('#m3_loserName').html(un);
 		});
 
 		</script>
