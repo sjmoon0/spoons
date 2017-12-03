@@ -59,7 +59,7 @@ $(document).ready(function(){
     }
   });
   $("#a_use_as_mobile").click(function(){
-    window.location.replace("http://"+domainAddress+":3000/mobile");
+    window.location.replace("http://"+domainAddress+"/mobile");
   });
   $('#c_create_room').click(function(){
     goToState('b');

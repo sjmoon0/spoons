@@ -84,7 +84,7 @@ $(document).ready(function(){
     }
   });
   $("#m1_use_as_desktop").click(function(){
-    window.location.replace("http://"+domainAddress+":3000/desktop");
+    window.location.replace("http://"+domainAddress+"/desktop");
   });
   $("#m1_join_room").click(function(){
     if(validate1()){
