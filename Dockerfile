@@ -13,17 +13,13 @@ RUN dnf install -y git nodejs npm
 WORKDIR /app
 ADD . /app
 
-
 ADD repo-key /
 RUN chmod 600 /repo-key
 RUN echo "IdentityFile /repo-key" >> /etc/ssh/ssh_config
 RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 RUN git clone https://github.com/sjmoon0/spoons.git
 
-WORKDIR webapp
-RUN npm install
-
-COPY . /app/webapp/
+RUN npm install package.json
 
 EXPOSE 3000
 CMD ["node", "app.js"]

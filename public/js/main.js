@@ -1,4 +1,4 @@
-var domainAddress = "192.168.1.159";
+var domainAddress = "moonman.website";
 function createPieChart(ia,lab) {
   var temp=[];
   var sum=0;
