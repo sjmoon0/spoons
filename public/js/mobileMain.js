@@ -2,7 +2,7 @@ var socket = io();
 var currRoom='';
 var userName='';
 var tog=true;
-var domainAddress="moonman.website";
+var domainAddress="spoons.moonman.website";
 
 function validate1(){
   if($('#m1_room_name').val()==''||$('#m1_room_name').val()==null){
