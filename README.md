@@ -22,11 +22,11 @@ the status of the game. *Note* By using the Advanced Settings at the main menu,
 it is possible to switch the function from/to Mobile <--> Desktop.
 Each group playing a game is organized into rooms.
 ### Game setup:
-1. On a desktop computer, visit SITE_NAME_HERE
+1. On a desktop computer, visit [moonman.website](https://moonman.website)
 2. If you know the room you wish to monitor, click View Rooms and select the room or choose to enter a private room. Otherwise, click Create Room and follow the prompt to  create a room
 3. Note that multiple desktop clients can be logged in to so the game can be played by a group of people in different physical locations
 4. The monitor will now show the players logging in
-5. To log in as a player, each individual must use a mobile device and visit SITE_NAME_HERE
+5. To log in as a player, each individual must use a mobile device and visit [moonman.website](https://moonman.website)
 6. Enter the room name and a username to enter a room and play
 7. Once the room has been entered, review the instructions and press Ready to Play
 8. Once all players have pressed Ready, the game begins
