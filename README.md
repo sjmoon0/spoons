@@ -35,6 +35,7 @@ The objective of the game is to not be left without a spoon. For every n players
 there are n-1 spoons. A spoon can only be grabbed in two conditions:
 - If you have 4 of a kind in your hand
 - If you noticed that someone else grabbed a spoon
+
 Cards are passed from one player to the next while each player is attempting to gather four of the same card.
 There can only be 4 cards in your hand at a time, this does not include the current card being inspected.
 1. When the player sees a pink rectangle on the right side of the screen, then that means there is a card ready for them to draw.
@@ -44,13 +45,13 @@ There can only be 4 cards in your hand at a time, this does not include the curr
 5. To grab a spoon when one of the above conditions is true, press the Grab Spoon button
 
 ## Tools/Frameworks used
-Node.js
-Express
-Socket.io
-Bootstrap
-jQuery
-Hammer.js
-Piecharts.js
+- Node.js
+- Express
+- Socket.io
+- Bootstrap
+- jQuery
+- Hammer.js
+- Piecharts.js
 
 ## License
 Copyright (C) 2015-2017  Steven Moon
